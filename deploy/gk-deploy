@@ -399,6 +399,11 @@ read -rp "[Y]es, [N]o? [Default: N]: " abortopt
 fi
 
 if [[ ${LOAD} -eq 0 ]]; then
+  ${CLI} get pods -o wide | grep -q "^heketi*"
+  if [[ $? -eq 0 ]]; then
+    output "Found heketi pod running. Please destroy existing setup and try again."
+    exit 1
+  fi
   if [[ "${CLI}" == *oc* ]]; then
     ${CLI} create -f ${TEMPLATES}/deploy-heketi-template.yaml
     ${CLI} create -f ${TEMPLATES}/heketi-service-account.yaml
